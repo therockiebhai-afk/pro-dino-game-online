@@ -1,349 +1,434 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Dino P2E - Prototype</title>
+    <title>Neon Dino - Play to Earn</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles to enhance the neon/retro theme */
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #0d0d1a;
-            color: #e0e0e0;
-            overflow: hidden; /* Prevent scrolling */
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* A deep, dark blue-charcoal */
         }
         .font-press-start {
             font-family: 'Press Start 2P', cursive;
         }
-        .text-glow-cyan {
-            text-shadow: 0 0 5px #06b6d4, 0 0 10px #06b6d4, 0 0 15px #06b6d4;
+        .neon-text-cyan {
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.7), 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
         }
-        .text-glow-pink {
-            text-shadow: 0 0 5px #ec4899, 0 0 10px #ec4899, 0 0 15px #ec4899;
+        .neon-text-magenta {
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.7), 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
         }
-        .card {
-            background-color: rgba(23, 23, 38, 0.8);
-            border: 1px solid #3d3d5c;
-            backdrop-filter: blur(10px);
+        .neon-box-cyan {
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 16px rgba(0, 255, 255, 0.6), inset 0 0 8px rgba(0, 255, 255, 0.5);
         }
-        .btn-primary {
-            background: linear-gradient(45deg, #ec4899, #8b5cf6);
+        .neon-box-magenta {
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.8), 0 0 16px rgba(255, 0, 255, 0.6), inset 0 0 8px rgba(255, 0, 255, 0.5);
+        }
+        .btn-glow {
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(236, 72, 153, 0.5), 0 0 20px rgba(139, 92, 246, 0.5);
         }
-        .btn-primary:hover {
+        .btn-glow:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(236, 72, 153, 0.8), 0 0 25px rgba(139, 92, 246, 0.8);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6);
         }
         #gameCanvas {
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><line x1="0" y1="50" x2="100" y2="50" stroke="%231a1a33" /><line x1="50" y1="0" x2="50" y2="100" stroke="%231a1a33" /></svg>');
-            background-size: 20px 20px;
-            border: 2px solid #3d3d5c;
+            background: linear-gradient(180deg, #0d1117 0%, #1a202c 100%);
+            border: 2px solid #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
         }
-        /* Background animated grid */
-        .background-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image:
-                linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            animation: moveGrid 20s linear infinite;
+        .token-earn-animation {
+            animation: fadeAndFloat 1.5s ease-out forwards;
         }
-        @keyframes moveGrid {
-            from { background-position: 0 0; }
-            to { background-position: -400px 400px; }
+        @keyframes fadeAndFloat {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
         }
     </style>
 </head>
-<body class="w-screen h-screen flex items-center justify-center p-4">
-    <div class="background-grid"></div>
+<body class="text-white">
 
-    <div id="mainContainer" class="w-full max-w-4xl mx-auto text-center">
-        <!-- Header -->
-        <h1 class="font-press-start text-3xl md:text-5xl text-glow-cyan mb-4">NEON DINO P2E</h1>
-        <p class="mb-8 text-lg text-gray-400">The Retro Arcade Play-to-Earn Simulator</p>
-
-        <!-- Dashboard -->
-        <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div class="card rounded-lg p-4">
-                <h2 class="font-press-start text-sm text-cyan-400 mb-2">WALLET BALANCE</h2>
-                <p class="text-3xl font-bold flex items-center justify-center">
-                    <span id="walletBalance" class="text-glow-cyan">0.00</span>
-                    <span class="font-press-start text-lg ml-2 text-cyan-500">$NEON</span>
-                </p>
-            </div>
-            <div class="card rounded-lg p-4">
-                <h2 class="font-press-start text-sm text-pink-400 mb-2">HIGH SCORE</h2>
-                <p id="highScore" class="text-3xl font-bold text-glow-pink">0</p>
-            </div>
-        </div>
-
-        <!-- Game Area -->
-        <div id="gameArea" class="relative w-full aspect-[2/1] mx-auto hidden">
-            <canvas id="gameCanvas" class="w-full h-full rounded-lg"></canvas>
-            <div id="gameOverScreen" class="absolute inset-0 bg-black bg-opacity-70 flex-col items-center justify-center rounded-lg hidden">
-                <h2 class="font-press-start text-4xl text-red-500 text-glow-pink mb-4">GAME OVER</h2>
-                <p class="text-xl mb-2">You earned: <span id="earnings" class="font-bold text-cyan-400"></span></p>
-                <button id="restartButton" class="btn-primary font-press-start text-white py-3 px-6 rounded-lg text-lg">RESTART</button>
-            </div>
-             <div id="scoreDisplay" class="absolute top-4 right-4 font-press-start text-2xl text-white">0</div>
-        </div>
-
-        <!-- Initial Play Button -->
-        <div id="startScreen">
-             <button id="playButton" class="btn-primary font-press-start text-white py-4 px-8 rounded-lg text-xl mt-8 animate-pulse">
-                PLAY & EARN
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-30 backdrop-blur-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold font-press-start text-cyan-400 neon-text-cyan">NEON DINO</h1>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#game" class="hover:text-cyan-400 transition-colors">Game</a>
+                <a href="#dashboard" class="hover:text-cyan-400 transition-colors">Dashboard</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors">Marketplace</a>
+            </nav>
+            <button id="connectWalletBtn" class="bg-cyan-500 text-black font-bold py-2 px-6 rounded-lg neon-box-cyan btn-glow">
+                Connect Wallet
             </button>
-            <p class="mt-4 text-gray-500">Press [SPACE] to Jump</p>
         </div>
-    </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section id="hero" class="text-center py-20 md:py-32">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-6xl font-black uppercase font-press-start neon-text-magenta">Dino Run</h2>
+                <h3 class="text-2xl md:text-4xl font-bold text-cyan-400 mt-2">The Ultimate Play-to-Earn Arcade Experience</h3>
+                <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-300">
+                    Play the endlessly addictive classic runner, reborn with a neon-drenched aesthetic. Earn real crypto rewards ($DINO) for high scores and collect epic, tradable NFT skins.
+                </p>
+                <a href="#game" class="mt-10 inline-block bg-magenta-600 text-white font-bold py-4 px-10 rounded-lg text-xl neon-box-magenta transition-transform hover:scale-105" style="background-color: #d800a3; box-shadow: 0 0 8px #d800a3, 0 0 16px #d800a3;">
+                    Play Now & Earn
+                </a>
+            </div>
+        </section>
+
+        <!-- Game Section -->
+        <section id="game" class="py-16">
+            <div class="container mx-auto px-6 text-center">
+                 <div id="gameContainer" class="relative max-w-4xl mx-auto">
+                    <canvas id="gameCanvas" width="800" height="250" class="w-full h-auto rounded-lg"></canvas>
+                    <div id="gameOverScreen" class="absolute inset-0 bg-black bg-opacity-70 flex-col justify-center items-center text-center rounded-lg hidden">
+                        <h2 class="text-5xl font-press-start text-red-500">GAME OVER</h2>
+                        <p class="text-xl mt-4">Your Score: <span id="finalScore">0</span></p>
+                        <button id="restartBtn" class="mt-8 bg-cyan-500 text-black font-bold py-3 px-8 rounded-lg neon-box-cyan btn-glow">Restart</button>
+                    </div>
+                 </div>
+                 <p class="mt-4 text-gray-400 text-lg">Press <kbd class="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Space</kbd> or <kbd class="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Click</kbd> to Jump!</p>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how" class="py-20 bg-gray-900 bg-opacity-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-center text-4xl font-bold font-press-start neon-text-cyan">How It Works</h2>
+                <div class="mt-16 grid md:grid-cols-3 gap-12 text-center">
+                    <div class="border border-cyan-500/30 p-8 rounded-xl bg-slate-800">
+                        <div class="text-6xl text-cyan-400 mb-4">1.</div>
+                        <h3 class="text-2xl font-bold mb-2">PLAY THE GAME</h3>
+                        <p class="text-gray-400">Enjoy the fast-paced, addictive gameplay. Dodge obstacles and survive as long as you can to rack up your high score.</p>
+                    </div>
+                    <div class="border border-cyan-500/30 p-8 rounded-xl bg-slate-800">
+                        <div class="text-6xl text-cyan-400 mb-4">2.</div>
+                        <h3 class="text-2xl font-bold mb-2">EARN $DINO</h3>
+                        <p class="text-gray-400">The higher your score, the more $DINO tokens you earn. Rewards are calculated based on performance and paid out to your wallet.</p>
+                    </div>
+                    <div class="border border-cyan-500/30 p-8 rounded-xl bg-slate-800">
+                        <div class="text-6xl text-cyan-400 mb-4">3.</div>
+                        <h3 class="text-2xl font-bold mb-2">COLLECT NFTs</h3>
+                        <p class="text-gray-400">Use your $DINO to buy rare, tradable NFT skins in the marketplace. Equip your favorite skin and show it off in-game!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-center text-4xl font-bold font-press-start neon-text-cyan">Your Dashboard</h2>
+                <div class="mt-16 grid lg:grid-cols-3 gap-8">
+                    <!-- Token Balance & Stats -->
+                    <div class="lg:col-span-1 bg-slate-800 border border-magenta-500/30 p-6 rounded-xl">
+                        <h3 class="text-2xl font-bold text-magenta-400 neon-text-magenta">Stats & Balance</h3>
+                        <div class="mt-6 bg-slate-900 p-6 rounded-lg text-center">
+                            <p class="text-gray-400 text-sm">CURRENT $DINO BALANCE</p>
+                            <p id="tokenBalance" class="text-4xl font-bold text-cyan-400 mt-2">1,250.75</p>
+                        </div>
+                        <div class="mt-4 space-y-3">
+                           <div class="flex justify-between items-center text-lg"><span class="text-gray-400">All-Time High Score:</span> <span id="highScoreDisplay" class="font-semibold">0</span></div>
+                           <div class="flex justify-between items-center text-lg"><span class="text-gray-400">Games Played:</span> <span id="gamesPlayedDisplay" class="font-semibold">0</span></div>
+                        </div>
+                    </div>
+
+                    <!-- NFT Garage -->
+                    <div class="lg:col-span-2 bg-slate-800 border border-cyan-500/30 p-6 rounded-xl">
+                        <h3 class="text-2xl font-bold text-cyan-400 neon-text-cyan">NFT Garage</h3>
+                        <p class="text-gray-400 mt-1">Select your active Dino skin.</p>
+                        <div class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <!-- NFT Item 1 -->
+                            <div class="nft-item border-4 border-cyan-400 rounded-lg p-2 bg-slate-900 cursor-pointer" data-skin-color="#0ff">
+                                <div class="aspect-square bg-slate-700 rounded flex items-center justify-center">
+                                    <div class="w-16 h-16" style="background-color: #0ff;"></div> <!-- Dino Placeholder -->
+                                </div>
+                                <p class="font-bold mt-2 text-center">Neon Original</p>
+                                <p class="text-sm text-cyan-400 text-center">EQUIPPED</p>
+                            </div>
+                            <!-- NFT Item 2 -->
+                            <div class="nft-item border-2 border-transparent hover:border-cyan-400 rounded-lg p-2 bg-slate-900 cursor-pointer" data-skin-color="#ff00ff">
+                                <div class="aspect-square bg-slate-700 rounded flex items-center justify-center">
+                                     <div class="w-16 h-16" style="background-color: #ff00ff;"></div>
+                                </div>
+                                <p class="font-bold mt-2 text-center">Synthwave Glitch</p>
+                                <p class="text-sm text-gray-500 text-center">Select to Equip</p>
+                            </div>
+                            <!-- NFT Item 3 -->
+                            <div class="nft-item border-2 border-transparent hover:border-cyan-400 rounded-lg p-2 bg-slate-900 cursor-pointer" data-skin-color="#ffff00">
+                                <div class="aspect-square bg-slate-700 rounded flex items-center justify-center">
+                                     <div class="w-16 h-16" style="background-color: #ffff00;"></div>
+                                </div>
+                                <p class="font-bold mt-2 text-center">Golden God</p>
+                                <p class="text-sm text-gray-500 text-center">Select to Equip</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-8">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; 2025 Neon Dino. All Rights Reserved.</p>
+            <p class="text-sm mt-2">This is a prototype demonstration. $DINO is not a real cryptocurrency.</p>
+        </div>
+    </footer>
+
 
     <script>
-    // --- DOM ELEMENTS ---
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const playButton = document.getElementById('playButton');
-    const restartButton = document.getElementById('restartButton');
-    const dashboard = document.getElementById('dashboard');
-    const gameArea = document.getElementById('gameArea');
-    const startScreen = document.getElementById('startScreen');
-    const gameOverScreen = document.getElementById('gameOverScreen');
-    const scoreDisplay = document.getElementById('scoreDisplay');
-    const walletBalanceDisplay = document.getElementById('walletBalance');
-    const highScoreDisplay = document.getElementById('highScore');
-    const earningsDisplay = document.getElementById('earnings');
+    document.addEventListener('DOMContentLoaded', () => {
 
-    // --- GAME CONFIG ---
-    let canvasWidth, canvasHeight;
-    const playerWidth = 40;
-    const playerHeight = 40;
-    const gravity = 0.6;
-    const jumpStrength = -12;
-    let gameSpeed = 5;
-    const gameSpeedIncrease = 0.001;
-    const tokenConversionRate = 10; // 10 score points = 1 $NEON token
+        // --- UI Interactivity ---
+        const connectWalletBtn = document.getElementById('connectWalletBtn');
+        connectWalletBtn.addEventListener('click', () => {
+            connectWalletBtn.textContent = 'Connecting...';
+            setTimeout(() => {
+                connectWalletBtn.textContent = '0x1A2b...C3D4';
+                connectWalletBtn.disabled = true;
+            }, 1500);
+        });
 
-    // --- GAME STATE ---
-    let player, obstacles, score, highScore, walletBalance, isGameOver, animationFrameId;
+        const nftItems = document.querySelectorAll('.nft-item');
+        nftItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove selected state from all
+                nftItems.forEach(i => {
+                    i.classList.remove('border-cyan-400', 'border-4');
+                    i.classList.add('border-transparent', 'border-2', 'hover:border-cyan-400');
+                    i.querySelector('p:last-child').textContent = 'Select to Equip';
+                    i.querySelector('p:last-child').classList.remove('text-cyan-400');
+                    i.querySelector('p:last-child').classList.add('text-gray-500');
+                });
 
-    function initializeState() {
-        player = {
+                // Add selected state to clicked one
+                item.classList.add('border-cyan-400', 'border-4');
+                item.classList.remove('border-transparent', 'border-2', 'hover:border-cyan-400');
+                item.querySelector('p:last-child').textContent = 'EQUIPPED';
+                item.querySelector('p:last-child').classList.add('text-cyan-400');
+                item.querySelector('p:last-child').classList.remove('text-gray-500');
+
+                // Update game dino color
+                dino.color = item.dataset.skinColor;
+            });
+        });
+
+
+        // --- Game Logic ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('gameContainer');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const restartBtn = document.getElementById('restartBtn');
+        const finalScoreEl = document.getElementById('finalScore');
+        
+        const tokenBalanceEl = document.getElementById('tokenBalance');
+        const highScoreDisplay = document.getElementById('highScoreDisplay');
+        const gamesPlayedDisplay = document.getElementById('gamesPlayedDisplay');
+
+        let score = 0;
+        let highScore = 0;
+        let gamesPlayed = 0;
+        let scoreInterval;
+        let obstacleInterval;
+        let gameSpeed = 5;
+        let isGameOver = false;
+        let tokenThreshold = 100;
+
+        let dino = {
             x: 50,
-            y: canvasHeight - playerHeight,
-            width: playerWidth,
-            height: playerHeight,
-            dy: 0, // velocity y
-            onGround: true
+            y: canvas.height - 40,
+            width: 30,
+            height: 30,
+            velocityY: 0,
+            isJumping: false,
+            color: '#0ff' // Default Neon Original color
         };
-        obstacles = [];
-        score = 0;
-        highScore = localStorage.getItem('dinoHighScore') || 0;
-        walletBalance = parseFloat(localStorage.getItem('dinoWalletBalance')) || 0;
-        isGameOver = false;
-        gameSpeed = 5;
-        
-        updateDisplays();
-    }
 
-    function updateDisplays() {
-        highScoreDisplay.textContent = highScore;
-        walletBalanceDisplay.textContent = walletBalance.toFixed(2);
-        scoreDisplay.textContent = Math.floor(score);
-    }
-    
-    // --- RESIZE CANVAS ---
-    function resizeCanvas() {
-        const container = document.getElementById('gameArea');
-        canvas.width = container.offsetWidth;
-        canvas.height = container.offsetHeight;
-        canvasWidth = canvas.width;
-        canvasHeight = canvas.height;
-        // Re-initialize state if game is not running to adapt player position
-        if (playButton.style.display !== 'none' || isGameOver) {
-             initializeState();
-        }
-    }
+        let obstacles = [];
 
-    // --- DRAWING FUNCTIONS ---
-    function drawPlayer() {
-        ctx.fillStyle = '#06b6d4'; // Cyan
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-        // Add a glow effect
-        ctx.shadowColor = '#06b6d4';
-        ctx.shadowBlur = 15;
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-        ctx.shadowBlur = 0;
-    }
-
-    function drawObstacles() {
-        ctx.fillStyle = '#ec4899'; // Pink
-        obstacles.forEach(obstacle => {
-            // Add a glow effect
-            ctx.shadowColor = '#ec4899';
+        function drawDino() {
+            ctx.fillStyle = dino.color;
+            ctx.shadowColor = dino.color;
             ctx.shadowBlur = 15;
-            ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
             ctx.shadowBlur = 0;
-        });
-    }
-
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    }
-
-    // --- GAME LOGIC ---
-    function handleJump(e) {
-        if (e.code === 'Space' && player.onGround) {
-            player.dy = jumpStrength;
-            player.onGround = false;
         }
-    }
 
-    function spawnObstacle() {
-        const minHeight = 20;
-        const maxHeight = 70;
-        const minWidth = 20;
-        const maxWidth = 40;
-        const height = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
-        const width = Math.floor(Math.random() * (maxWidth - minWidth + 1)) + minWidth;
-
-        obstacles.push({
-            x: canvasWidth,
-            y: canvasHeight - height,
-            width: width,
-            height: height
-        });
-    }
-
-    function updatePlayer() {
-        player.dy += gravity;
-        player.y += player.dy;
-
-        if (player.y + player.height > canvasHeight) {
-            player.y = canvasHeight - player.height;
-            player.dy = 0;
-            player.onGround = true;
-        }
-    }
-
-    function updateObstacles() {
-        for (let i = obstacles.length - 1; i >= 0; i--) {
-            obstacles[i].x -= gameSpeed;
-            if (obstacles[i].x + obstacles[i].width < 0) {
-                obstacles.splice(i, 1);
+        function drawObstacles() {
+            for (let obs of obstacles) {
+                ctx.fillStyle = '#ff00ff';
+                ctx.shadowColor = '#ff00ff';
+                ctx.shadowBlur = 15;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.shadowBlur = 0;
             }
         }
-    }
-    
-    function detectCollision() {
-        for (const obstacle of obstacles) {
-            if (
-                player.x < obstacle.x + obstacle.width &&
-                player.x + player.width > obstacle.x &&
-                player.y < obstacle.y + obstacle.height &&
-                player.y + player.height > obstacle.y
-            ) {
-                endGame();
-            }
+
+        function drawGround() {
+            ctx.strokeStyle = '#0ff';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = '#0ff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 10);
+            ctx.lineTo(canvas.width, canvas.height - 10);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
         }
-    }
-    
-    // --- GAME LOOP ---
-    let lastObstacleSpawnTime = 0;
-    let obstacleSpawnInterval = 2000; // Start interval
 
-    function gameLoop(currentTime) {
-        if (isGameOver) return;
+        function drawScore() {
+            ctx.fillStyle = 'white';
+            ctx.font = "20px 'Press Start 2P'";
+            ctx.textAlign = "right";
+            ctx.fillText("SCORE: " + Math.floor(score), canvas.width - 20, 30);
+        }
 
-        clearCanvas();
+        function update() {
+            if (isGameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply gravity
+            if (dino.isJumping) {
+                dino.y += dino.velocityY;
+                dino.velocityY += 0.8; // Gravity
+            }
+
+            // Ground collision
+            if (dino.y > canvas.height - 40) {
+                dino.y = canvas.height - 40;
+                dino.isJumping = false;
+                dino.velocityY = 0;
+            }
+
+            // Update obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= gameSpeed;
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                }
+
+                // Collision detection
+                if (
+                    dino.x < obstacles[i].x + obstacles[i].width &&
+                    dino.x + dino.width > obstacles[i].x &&
+                    dino.y < obstacles[i].y + obstacles[i].height &&
+                    dino.y + dino.height > obstacles[i].y
+                ) {
+                    gameOver();
+                }
+            }
+
+            drawGround();
+            drawDino();
+            drawObstacles();
+            drawScore();
+
+            requestAnimationFrame(update);
+        }
         
-        updatePlayer();
-        drawPlayer();
-        
-        updateObstacles();
-        drawObstacles();
-        
-        // Spawn obstacles with increasing frequency
-        if (currentTime - lastObstacleSpawnTime > obstacleSpawnInterval) {
-            spawnObstacle();
-            lastObstacleSpawnTime = currentTime;
-            // Decrease spawn interval to make game harder
-            if (obstacleSpawnInterval > 800) {
-                 obstacleSpawnInterval -= gameSpeed * 2;
+        function jump() {
+            if (!dino.isJumping && !isGameOver) {
+                dino.isJumping = true;
+                dino.velocityY = -15;
             }
         }
         
-        detectCollision();
-        
-        score += 0.1;
-        gameSpeed += gameSpeedIncrease;
-        scoreDisplay.textContent = Math.floor(score);
-        
-        animationFrameId = requestAnimationFrame(gameLoop);
-    }
-    
-    // --- GAME STATE MANAGEMENT ---
-    function startGame() {
-        isGameOver = false;
-        resizeCanvas(); // Ensure canvas is sized correctly before starting
-        initializeState();
-        
-        dashboard.classList.add('hidden');
-        startScreen.classList.add('hidden');
-        gameArea.classList.remove('hidden');
-        gameOverScreen.classList.add('hidden');
-
-        // Reset obstacle spawn timer
-        obstacleSpawnInterval = 2000;
-        lastObstacleSpawnTime = 0;
-
-        animationFrameId = requestAnimationFrame(gameLoop);
-    }
-
-    function endGame() {
-        if (isGameOver) return; // Prevent multiple calls
-        isGameOver = true;
-        cancelAnimationFrame(animationFrameId);
-        
-        const finalScore = Math.floor(score);
-        const earnedTokens = finalScore / tokenConversionRate;
-        
-        walletBalance += earnedTokens;
-        
-        if (finalScore > highScore) {
-            highScore = finalScore;
-            localStorage.setItem('dinoHighScore', highScore);
+        function createObstacle() {
+            if(isGameOver) return;
+            const height = Math.random() * 30 + 20;
+            obstacles.push({
+                x: canvas.width,
+                y: canvas.height - 10 - height,
+                width: 20,
+                height: height
+            });
         }
         
-        localStorage.setItem('dinoWalletBalance', walletBalance.toFixed(2));
+        function startScore() {
+             if (isGameOver) return;
+             scoreInterval = setInterval(() => {
+                score++;
+                if (score > highScore) {
+                    highScore = score;
+                    highScoreDisplay.textContent = Math.floor(highScore);
+                }
+                if (score % tokenThreshold === 0) {
+                    let currentBalance = parseFloat(tokenBalanceEl.textContent.replace(',', ''));
+                    currentBalance += 1.00; // Earn 1 token per threshold
+                    tokenBalanceEl.textContent = currentBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    showTokenEarnAnimation();
+                }
+
+                // Increase speed over time
+                if(score % 200 === 0) {
+                    gameSpeed += 0.5;
+                }
+
+             }, 100);
+        }
+
+        function showTokenEarnAnimation() {
+            const tokenAnim = document.createElement('div');
+            tokenAnim.textContent = '+1 $DINO';
+            tokenAnim.className = 'absolute top-4 right-4 font-press-start text-cyan-400 token-earn-animation';
+            gameContainer.appendChild(tokenAnim);
+            setTimeout(() => {
+                tokenAnim.remove();
+            }, 1500);
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            clearInterval(scoreInterval);
+            clearInterval(obstacleInterval);
+            gameOverScreen.style.display = 'flex';
+            finalScoreEl.textContent = Math.floor(score);
+        }
+
+        function resetGame() {
+            score = 0;
+            gameSpeed = 5;
+            dino.y = canvas.height - 40;
+            obstacles = [];
+            isGameOver = false;
+            gameOverScreen.style.display = 'none';
+            gamesPlayed++;
+            gamesPlayedDisplay.textContent = gamesPlayed;
+            startGame();
+        }
+
+        function startGame() {
+            isGameOver = false; // Ensure game over is false
+            clearInterval(scoreInterval); // Clear any existing intervals
+            clearInterval(obstacleInterval);
+            
+            startScore();
+            obstacleInterval = setInterval(createObstacle, 2000); // Create obstacles
+            update();
+        }
+
+        // Event Listeners
+        document.body.onkeydown = function(e) {
+            if (e.keyCode == 32) {
+                jump();
+            }
+        };
+        canvas.addEventListener('click', jump);
+        restartBtn.addEventListener('click', resetGame);
         
-        earningsDisplay.textContent = `${earnedTokens.toFixed(2)} $NEON`;
-        updateDisplays();
-
-        gameOverScreen.style.display = 'flex'; // Use style to override hidden class
-        dashboard.classList.remove('hidden');
-    }
-    
-    // --- EVENT LISTENERS ---
-    playButton.addEventListener('click', startGame);
-    restartButton.addEventListener('click', startGame);
-    document.addEventListener('keydown', handleJump);
-    window.addEventListener('resize', resizeCanvas);
-
-    // --- INITIALIZATION ---
-    window.onload = () => {
-        resizeCanvas();
-        initializeState();
-    };
-
+        // Initial call to start the game
+        startGame();
+    });
     </script>
 </body>
 </html>
