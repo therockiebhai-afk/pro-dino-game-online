@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Dino - Play to Earn</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -187,6 +188,31 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
+        // --- Sound Effects ---
+        let audioReady = false;
+        const jumpSynth = new Tone.Synth({
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 }
+        }).toDestination();
+
+        const tokenSynth = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 0.2 }
+        }).toDestination();
+
+        const gameOverSynth = new Tone.Synth({
+            oscillator: { type: 'fmsquare' },
+            envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 0.4 }
+        }).toDestination();
+
+        function setupAudio() {
+            if (audioReady) return;
+            Tone.start();
+            audioReady = true;
+            console.log('Audio ready.');
+        }
+
+
         // --- UI Interactivity ---
         const connectWalletBtn = document.getElementById('connectWalletBtn');
         connectWalletBtn.addEventListener('click', () => {
@@ -337,7 +363,9 @@
         }
         
         function jump() {
+            setupAudio();
             if (!dino.isJumping && !isGameOver) {
+                jumpSynth.triggerAttackRelease("C4", "8n");
                 dino.isJumping = true;
                 dino.velocityY = -15;
             }
@@ -378,6 +406,7 @@
         }
 
         function showTokenEarnAnimation() {
+            tokenSynth.triggerAttackRelease("G5", "8n", Tone.now());
             const tokenAnim = document.createElement('div');
             tokenAnim.textContent = '+1 $DINO';
             tokenAnim.className = 'absolute top-4 right-4 font-press-start text-cyan-400 token-earn-animation';
@@ -388,6 +417,8 @@
         }
 
         function gameOver() {
+            if(isGameOver) return;
+            gameOverSynth.triggerAttackRelease("C2", "0.5s");
             isGameOver = true;
             clearInterval(scoreInterval);
             clearInterval(obstacleInterval);
@@ -420,6 +451,7 @@
         // Event Listeners
         document.body.onkeydown = function(e) {
             if (e.keyCode == 32) {
+                e.preventDefault(); 
                 jump();
             }
         };
@@ -432,3 +464,4 @@
     </script>
 </body>
 </html>
+
