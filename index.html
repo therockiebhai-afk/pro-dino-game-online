@@ -29,7 +29,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
     <!-- SEO Meta Tags -->
     <title>Pro Dino Game - Play Free Dino Game Online & Earn Rewards</title>
@@ -83,6 +83,29 @@
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
         #mobile-jump-btn:active { transform: scale(0.95); background-color: #0ababacc; }
+        
+        /* Fullscreen mobile styles */
+        body.game-fullscreen main > *:not(#game-section-wrapper),
+        body.game-fullscreen header,
+        body.game-fullscreen footer {
+            display: none;
+        }
+        body.game-fullscreen #game-section-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+            padding: 0 !important;
+            background-color: #0d1117;
+        }
+        body.game-fullscreen #gameContainer {
+            max-width: none;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: unset;
+        }
     </style>
 </head>
 <body class="text-white overflow-x-hidden">
@@ -124,40 +147,43 @@
             </div>
         </section>
 
-        <!-- Game Section -->
-        <section id="game" class="py-16">
-            <div class="container mx-auto px-4 text-center">
-                 <div id="gameContainer" class="relative max-w-4xl mx-auto aspect-[16/6]">
-                    <canvas id="gameCanvas" class="w-full h-full rounded-lg"></canvas>
-                    <div id="gameOverScreen" class="absolute inset-0 bg-black/70 backdrop-blur-sm flex-col justify-center items-center text-center rounded-lg hidden">
-                        <h2 class="text-3xl sm:text-5xl font-press-start text-red-500">GAME OVER</h2>
-                        <p class="text-lg sm:text-xl mt-4">Your Score: <span id="finalScore">0</span></p>
-                        <div class="mt-6 flex gap-3">
-                            <button id="shareTwitterBtn" class="bg-blue-500 text-white font-bold p-3 rounded-lg hover:bg-blue-600 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                            </button>
-                            <button id="shareWhatsAppBtn" class="bg-green-500 text-white font-bold p-3 rounded-lg hover:bg-green-600 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m.01 1.67c4.55 0 8.25 3.7 8.25 8.25 0 4.55-3.7 8.25-8.25 8.25-1.53 0-3-.42-4.29-1.19l-.3-.18-3.18.84.85-3.11-.2-.32a8.18 8.18 0 0 1-1.26-4.38c0-4.55 3.7-8.25 8.25-8.25m4.52 10.2c-.25-.12-1.47-.72-1.7-.8s-.39-.12-.55.12c-.16.25-.64.8-.79.96-.15.16-.3.18-.55.06s-1.04-.38-1.98-1.22c-.74-.66-1.23-1.47-1.38-1.72s-.02-.38.1-.51c.11-.11.25-.28.37-.42s.16-.25.24-.42c.08-.16.04-.3-.02-.42s-.55-1.32-.75-1.81c-.2-.48-.4-.42-.55-.42s-.3 0-.46 0c-.16 0-.42.06-.64.3s-.87.85-1.06 2.07c-.2 1.22.89 2.4 1.02 2.56.12.16 1.76 2.68 4.27 3.77 2.5 1.08 2.5.72 2.95.69.45-.03 1.47-.6 1.68-1.18.2-.58.2-1.08.14-1.18s-.24-.16-.5-.28"/></svg>
-                            </button>
+        <!-- Game Section Wrapper -->
+        <div id="game-section-wrapper">
+            <section id="game" class="py-16">
+                <div class="container mx-auto px-4 text-center">
+                     <div id="gameContainer" class="relative max-w-4xl mx-auto aspect-[16/6]">
+                        <canvas id="gameCanvas" class="w-full h-full rounded-lg"></canvas>
+                        <div id="gameOverScreen" class="absolute inset-0 bg-black/70 backdrop-blur-sm flex-col justify-center items-center text-center rounded-lg hidden">
+                            <h2 class="text-3xl sm:text-5xl font-press-start text-red-500">GAME OVER</h2>
+                            <p class="text-lg sm:text-xl mt-4">Your Score: <span id="finalScore">0</span></p>
+                            <div class="mt-6 flex gap-3">
+                                <button id="shareTwitterBtn" class="bg-blue-500 text-white font-bold p-3 rounded-lg hover:bg-blue-600 transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                </button>
+                                <button id="shareWhatsAppBtn" class="bg-green-500 text-white font-bold p-3 rounded-lg hover:bg-green-600 transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m.01 1.67c4.55 0 8.25 3.7 8.25 8.25 0 4.55-3.7 8.25-8.25 8.25-1.53 0-3-.42-4.29-1.19l-.3-.18-3.18.84.85-3.11-.2-.32a8.18 8.18 0 0 1-1.26-4.38c0-4.55 3.7-8.25 8.25-8.25m4.52 10.2c-.25-.12-1.47-.72-1.7-.8s-.39-.12-.55.12c-.16.25-.64.8-.79.96-.15.16-.3.18-.55.06s-1.04-.38-1.98-1.22c-.74-.66-1.23-1.47-1.38-1.72s-.02-.38.1-.51c.11-.11.25-.28.37-.42s.16-.25.24-.42c.08-.16.04-.3-.02-.42s-.55-1.32-.75-1.81c-.2-.48-.4-.42-.55-.42s-.3 0-.46 0c-.16 0-.42.06-.64.3s-.87.85-1.06 2.07c-.2 1.22.89 2.4 1.02 2.56.12.16 1.76 2.68 4.27 3.77 2.5 1.08 2.5.72 2.95.69.45-.03 1.47-.6 1.68-1.18.2-.58.2-1.08.14-1.18s-.24-.16-.5-.28"/></svg>
+                                </button>
+                            </div>
+                            <button id="restartBtn" class="mt-4 bg-cyan-500 text-black font-bold py-3 px-8 rounded-lg shadow-[0_0_8px_rgba(0,255,255,0.8)] btn-glow">Restart</button>
                         </div>
-                        <button id="restartBtn" class="mt-4 bg-cyan-500 text-black font-bold py-3 px-8 rounded-lg shadow-[0_0_8px_rgba(0,255,255,0.8)] btn-glow">Restart</button>
-                    </div>
-                 </div>
-                 <div class="mt-4 max-w-xl mx-auto">
-                    <div class="flex justify-between text-sm font-semibold text-cyan-400 mb-1">
-                        <span>Reward Progress</span>
-                        <span id="progress-text">0 / 100</span>
-                    </div>
-                    <div class="w-full bg-slate-700 rounded-full h-4 border-2 border-slate-600">
-                        <div id="reward-progress-bar" class="bg-cyan-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
-                    </div>
-                 </div>
-                 <button id="mobile-jump-btn" class="md:hidden fixed bottom-5 right-5 bg-cyan-500/80 backdrop-blur-sm text-black font-bold w-20 h-20 rounded-full text-lg shadow-[0_0_15px_rgba(0,255,255,0.8)] flex items-center justify-center z-40">JUMP</button>
-                 <div class="mt-8 w-full max-w-4xl mx-auto min-h-[90px] flex justify-center items-center">
-                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8891230579666870" data-ad-slot="6919295084" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                 </div>
-            </div>
-        </section>
+                     </div>
+                     <div class="mt-4 max-w-xl mx-auto">
+                        <div class="flex justify-between text-sm font-semibold text-cyan-400 mb-1">
+                            <span>Reward Progress</span>
+                            <span id="progress-text">0 / 100</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-4 border-2 border-slate-600">
+                            <div id="reward-progress-bar" class="bg-cyan-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
+                     </div>
+                     <button id="fullscreen-btn" class="hidden md:hidden fixed bottom-5 left-5 bg-blue-500/80 backdrop-blur-sm text-white font-bold w-20 h-20 rounded-full text-sm shadow-[0_0_15px_rgba(0,180,255,0.8)] flex items-center justify-center z-40">FULLSCREEN</button>
+                     <button id="mobile-jump-btn" class="md:hidden fixed bottom-5 right-5 bg-cyan-500/80 backdrop-blur-sm text-black font-bold w-20 h-20 rounded-full text-lg shadow-[0_0_15px_rgba(0,255,255,0.8)] flex items-center justify-center z-40">JUMP</button>
+                     <div class="mt-8 w-full max-w-4xl mx-auto min-h-[90px] flex justify-center items-center">
+                        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8891230579666870" data-ad-slot="6919295084" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                     </div>
+                </div>
+            </section>
+        </div>
         
         <!-- Leaderboard Section -->
         <section id="leaderboard" class="py-16 bg-gray-900/50">
@@ -337,6 +363,7 @@
         const highScoreDisplay = document.getElementById('highScoreDisplay');
         const gamesPlayedDisplay = document.getElementById('gamesPlayedDisplay');
         const mobileJumpBtn = document.getElementById('mobile-jump-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
         const rewardProgressBar = document.getElementById('reward-progress-bar');
         const progressText = document.getElementById('progress-text');
         const shareTwitterBtn = document.getElementById('shareTwitterBtn');
@@ -358,11 +385,12 @@
         let score = 0, highScore = 0, gamesPlayed = 0;
         let scoreInterval, obstacleInterval;
         let gameSpeed, initialGameSpeed;
+        let obstacleIntervalTime, initialObstacleIntervalTime = 2000;
         let isGameOver = true;
         let tokenThreshold = 100;
 
         let dino = {
-            baseY: BASE_HEIGHT - 40,
+            baseY: BASE_HEIGHT - 10, // Corrected base Y to match ground line
             baseWidth: 30,
             baseHeight: 30,
             baseVelocityY: -15,
@@ -374,9 +402,20 @@
         let obstacles = [];
 
         function setScaleAndResize() {
-            const containerWidth = gameContainer.clientWidth;
-            scaleRatio = containerWidth / BASE_WIDTH;
-            
+            const isMobile = window.innerWidth < 768;
+            fullscreenBtn.style.display = isMobile ? 'flex' : 'none';
+
+            let containerWidth, containerHeight;
+
+            if (document.body.classList.contains('game-fullscreen')) {
+                containerWidth = window.innerWidth;
+                containerHeight = window.innerHeight;
+                scaleRatio = Math.min(containerWidth / BASE_WIDTH, containerHeight / BASE_HEIGHT);
+            } else {
+                containerWidth = gameContainer.clientWidth;
+                scaleRatio = containerWidth / BASE_WIDTH;
+            }
+
             canvas.width = BASE_WIDTH;
             canvas.height = BASE_HEIGHT;
             
@@ -385,8 +424,9 @@
             dino.height = dino.baseHeight * scaleRatio;
             initialGameSpeed = 5 * scaleRatio;
             
-            // Reset and redraw
-            drawStartScreen();
+            if (isGameOver) {
+                drawStartScreen();
+            }
         }
 
         function drawDino() {
@@ -422,7 +462,7 @@
 
         function drawStartScreen() {
             ctx.clearRect(0, 0, BASE_WIDTH, BASE_HEIGHT);
-            dino.y = dino.baseY - dino.height; // Adjust position before drawing
+            dino.y = dino.baseY - dino.height; 
             drawGround();
             drawDino();
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -477,6 +517,7 @@
         }
         
         function startScore() {
+            let nextDifficultyIncrease = 300;
             scoreInterval = setInterval(() => {
                 score++;
                 if (score > highScore) {
@@ -494,7 +535,18 @@
                     tokenBalanceEl.textContent = currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     showTokenEarnAnimation();
                 }
-                if (score > 0 && score % 200 === 0) gameSpeed += (0.5 * scaleRatio);
+                
+                // Dynamic Difficulty Increase
+                if(score > 0 && score >= nextDifficultyIncrease) {
+                    gameSpeed += (0.3 * scaleRatio);
+                    if (obstacleIntervalTime > 1000) { // Minimum interval
+                        obstacleIntervalTime -= 100;
+                        clearInterval(obstacleInterval);
+                        obstacleInterval = setInterval(createObstacle, obstacleIntervalTime);
+                    }
+                    nextDifficultyIncrease += 300;
+                }
+
             }, 100);
         }
 
@@ -515,12 +567,15 @@
             clearInterval(obstacleInterval);
             gameOverScreen.style.display = 'flex';
             finalScoreEl.textContent = Math.floor(score);
+            document.body.classList.remove('game-fullscreen');
+            if (document.fullscreenElement) document.exitFullscreen();
             setTimeout(showAdPopup, 1000); // Show ad after a delay
         }
 
         function resetGame() {
             score = 0; 
             gameSpeed = initialGameSpeed; 
+            obstacleIntervalTime = initialObstacleIntervalTime;
             dino.y = dino.baseY - dino.height;
             dino.velocityY = 0;
             dino.isJumping = false;
@@ -539,7 +594,7 @@
             clearInterval(scoreInterval); clearInterval(obstacleInterval);
             isGameOver = false;
             startScore();
-            obstacleInterval = setInterval(createObstacle, 2000);
+            obstacleInterval = setInterval(createObstacle, obstacleIntervalTime);
             update();
         }
         
@@ -588,17 +643,32 @@
             if (gamesPlayedDisplay) gamesPlayedDisplay.textContent = gamesPlayed;
         }
 
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.body.classList.add('game-fullscreen');
+                document.documentElement.requestFullscreen().then(setScaleAndResize).catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    document.body.classList.remove('game-fullscreen');
+                });
+            } else {
+                document.body.classList.remove('game-fullscreen');
+                document.exitFullscreen().then(setScaleAndResize);
+            }
+        }
+
         // --- Event Listeners ---
         document.body.onkeydown = (e) => { if (e.code === 'Space') { e.preventDefault(); jump(); }};
         const jumpHandler = (e) => { e.preventDefault(); jump(); };
         canvas.addEventListener('click', jumpHandler);
         canvas.addEventListener('touchstart', jumpHandler, { passive: false });
         mobileJumpBtn.addEventListener('touchstart', jumpHandler, { passive: false });
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
         restartBtn.addEventListener('click', resetGame);
         shareTwitterBtn.addEventListener('click', () => shareScore('twitter'));
         shareWhatsAppBtn.addEventListener('click', () => shareScore('whatsapp'));
         closeAdBtn.addEventListener('click', hideAdPopup);
         window.addEventListener('resize', setScaleAndResize);
+        document.addEventListener('fullscreenchange', setScaleAndResize);
 
         // --- Initial Load ---
         loadStats();
